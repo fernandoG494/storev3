@@ -33,6 +33,23 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
+        var logger = loggerFactory.CreateLogger(ex);
+        logger.LogError(ex, "An error ocurried on the server");
+    }
+    ;
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+    try
+    {
+        var context = services.GetRequiredService<StoreContext>();
+        await context.Database.MigrateAsync();
+    }
+    catch (Exception ex)
+    {
         var logger = loggerFactory.CreateLogger<Program>();
         logger.LogError(ex, "Error ocurred on server");
     }
