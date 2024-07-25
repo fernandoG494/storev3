@@ -1,5 +1,6 @@
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-using (var scope = app.Services.CreateScope())
+using ( var scope = app.Services.CreateScope() )
 {
     var services = scope.ServiceProvider;
     var loggerFactory = services.GetRequiredService<ILoggerFactory>();
@@ -31,12 +32,11 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<StoreContext>();
         await context.Database.MigrateAsync();
     }
-    catch (Exception ex)
+    catch ( Exception ex )
     {
-        var logger = loggerFactory.CreateLogger(ex);
-        logger.LogError(ex, "An error ocurried on the server");
+        var logger = loggerFactory.CreateLogger<Program>();
+        logger.LogError(ex, "Error during migration");
     }
-    ;
 }
 
 using (var scope = app.Services.CreateScope())
